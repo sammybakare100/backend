@@ -1,6 +1,5 @@
 import express from "express";
 import Habit from "../models/habit.js";
-
 import { protect } from "../middleware/auth.js";
 
 const router = express.Router();
@@ -51,23 +50,22 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// Delete a habit
-// Delete a habit
+//Delete a habit
 router.delete("/:id", async (req, res) => {
   try {
     const habit = await Habit.findById(req.params.id);
     if (!habit) return res.status(404).json({ message: "Habit not found" });
 
-    // Check that the logged-in user owns this habit
-    if (habit.user.toString() !== req.user._id.toString())
+    // Ensure the logged-in user owns this habit
+    if (habit.user.toString() !== req.user._id.toString()) {
       return res.status(401).json({ message: "Not authorized" });
+    }
 
-    // Delete habit
-    await Habit.findByIdAndDelete(req.params.id);
+    await Habit.findByIdAndDelete(req.params.id); // delete by ID
 
     res.json({ message: "Habit deleted successfully" });
   } catch (err) {
-    console.error(err);
+    console.error("Delete error:", err.message);
     res.status(500).json({ message: "Server error" });
   }
 });
